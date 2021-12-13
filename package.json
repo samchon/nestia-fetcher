@@ -1,0 +1,34 @@
+{
+  "name": "nestia-fetcher",
+  "version": "1.0.0",
+  "description": "Fetcher for the Nestia",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "build": "rimraf lib && tsc",
+    "dev": "npm run build -- --watch",
+    "test": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samchon/nestia-fetcher"
+  },
+  "keywords": [
+    "nestia",
+    "fetcher"
+  ],
+  "author": "Jeongho Nam",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/samchon/nestia-fetcher/issues"
+  },
+  "homepage": "https://github.com/samchon/nestia-fetcher#readme",
+  "devDependencies": {
+    "@types/node": "^16.11.12",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.5.3"
+  },
+  "dependencies": {
+    "node-fetch": "^3.1.0"
+  }
+}
