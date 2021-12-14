@@ -1,6 +1,6 @@
 {
   "name": "nestia-fetcher",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Fetcher for the Nestia",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -24,11 +24,11 @@
   },
   "homepage": "https://github.com/samchon/nestia-fetcher#readme",
   "devDependencies": {
-    "@types/node": "^16.11.12",
     "rimraf": "^3.0.2",
     "typescript": "^4.5.3"
   },
   "dependencies": {
-    "node-fetch": "^3.1.0"
+    "@types/node": "^16.11.12",
+    "node-fetch": "^2.6.1"
   }
 }
