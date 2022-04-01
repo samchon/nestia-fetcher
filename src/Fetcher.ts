@@ -100,7 +100,8 @@ export class Fetcher
                 const password: IEncryptionPassword | IEncryptionPassword.Closure = connection.encryption instanceof Function
                     ? connection.encryption!(content, true)
                     : connection.encryption!;
-                content = AesPkcs5.encrypt(content, password.key, password.iv);
+                if (is_disabled(password, content, true) === false)
+                    content = AesPkcs5.encrypt(content, password.key, password.iv);
             }
             init.body = content;
         }
@@ -130,8 +131,9 @@ export class Fetcher
         {
             const password: IEncryptionPassword | IEncryptionPassword.Closure = connection.encryption instanceof Function
                 ? connection.encryption!(content, false)
-                : connection.encryption!;
-            content = AesPkcs5.decrypt(content, password.key, password.iv);
+            : connection.encryption!;
+            if (is_disabled(password, content, false) === false)
+                content = AesPkcs5.decrypt(content, password.key, password.iv);
         }
 
         //----
@@ -188,4 +190,13 @@ export namespace Fetcher
          */
         response: boolean;
     }
+}
+
+function is_disabled(password: IEncryptionPassword, content: string, encoded: boolean): boolean
+{
+    if (password.disabled === undefined)
+        return false;
+    if (typeof password.disabled === "function")
+        return password.disabled(content, encoded);
+    return password.disabled;
 }

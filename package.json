@@ -1,6 +1,6 @@
 {
   "name": "nestia-fetcher",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Fetcher for the Nestia",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
