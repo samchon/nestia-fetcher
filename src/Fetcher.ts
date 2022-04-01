@@ -196,7 +196,8 @@ function is_disabled(password: IEncryptionPassword, content: string, encoded: bo
 {
     if (password.disabled === undefined)
         return false;
-    if (typeof password.disabled === "function")
+    else if (typeof password.disabled === "function")
         return password.disabled(content, encoded);
-    return password.disabled;
+    else
+        return password.disabled;
 }
