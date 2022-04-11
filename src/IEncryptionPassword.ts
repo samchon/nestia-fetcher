@@ -29,7 +29,7 @@ export interface IEncryptionPassword
      * 
      * Default is `false`.
      */
-    disabled?: boolean | ((content: string, encoded: boolean) => boolean);
+    disabled?: boolean | ((param: IEncryptionPassword.IParameter, encoded: boolean) => boolean);
 }
 export namespace IEncryptionPassword
 {
@@ -45,10 +45,19 @@ export namespace IEncryptionPassword
         /**
          * Encryption password getter.
          * 
-         * @param content Text content to be encrypted or decrypted
+         * @param param Request or response headers and body content
          * @param encoded Be encoded or to be decoded
          * @returns Encryption password
          */
-        (content: string, encoded: boolean): IEncryptionPassword;
+        (param: IParameter, encoded: boolean): IEncryptionPassword;
+    }
+
+    /**
+     * Parameter for the closure.
+     */
+    export interface IParameter
+    {
+        headers: Record<string, string>;
+        body: string;
     }
 }

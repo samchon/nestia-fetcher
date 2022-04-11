@@ -94,16 +94,17 @@ export class Fetcher
         // REQUEST BODY (WITH ENCRYPTION)
         if (input !== undefined)
         {
-            let content: string = JSON.stringify(input);
+            let body: string = JSON.stringify(input);
             if (encrypted.request === true)
             {
+                const headers: Singleton<Record<string, string>> = new Singleton(() => init.headers as Record<string, string>);
                 const password: IEncryptionPassword | IEncryptionPassword.Closure = connection.encryption instanceof Function
-                    ? connection.encryption!(content, true)
+                    ? connection.encryption!({ headers: headers.get(), body }, true)
                     : connection.encryption!;
-                if (is_disabled(password, content, true) === false)
-                    content = AesPkcs5.encrypt(content, password.key, password.iv);
+                if (is_disabled(password, headers, body, true) === false)
+                    body = AesPkcs5.encrypt(body, password.key, password.iv);
             }
-            init.body = content;
+            init.body = body;
         }
 
         //----
@@ -117,29 +118,30 @@ export class Fetcher
 
         // DO FETCH
         const response: Response = await fetch(url.href, init);
-        let content: string = await response.text();
+        let body: string = await response.text();
 
-        if (!content)
+        if (!body)
             return undefined!;
 
         // CHECK THE STATUS CODE
         if (response.status !== 200 && response.status !== 201)
-            throw new HttpError(method, path, response.status, content);
+            throw new HttpError(method, path, response.status, body);
 
         // FINALIZATION (WITH DECODING)
         if (encrypted.response === true)
         {
+            const headers: Singleton<Record<string, string>> = new Singleton(() => headers_to_object(response.headers));
             const password: IEncryptionPassword | IEncryptionPassword.Closure = connection.encryption instanceof Function
-                ? connection.encryption!(content, false)
-            : connection.encryption!;
-            if (is_disabled(password, content, false) === false)
-                content = AesPkcs5.decrypt(content, password.key, password.iv);
+                ? connection.encryption!({ headers: headers.get(), body }, false)
+                : connection.encryption!;
+            if (is_disabled(password, headers, body, false) === false)
+                body = AesPkcs5.decrypt(body, password.key, password.iv);
         }
 
         //----
         // OUTPUT
         //----
-        let ret: { __set_headers__: Record<string, any> } & Primitive<Output> = content as any;
+        let ret: { __set_headers__: Record<string, any> } & Primitive<Output> = body as any;
         try
         {
             // PARSE RESPONSE BODY
@@ -192,12 +194,45 @@ export namespace Fetcher
     }
 }
 
-function is_disabled(password: IEncryptionPassword, content: string, encoded: boolean): boolean
+function is_disabled
+    (
+        password: IEncryptionPassword, 
+        headers: Singleton<Record<string, string>>,
+        body: string,
+        encoded: boolean
+    ): boolean
 {
     if (password.disabled === undefined)
         return false;
-    else if (typeof password.disabled === "function")
-        return password.disabled(content, encoded);
-    else
-        return password.disabled;
+    if (typeof password.disabled === "function")
+        return password.disabled({
+            headers: headers.get(),
+            body
+        }, encoded);
+    return password.disabled;
 }
+
+function headers_to_object(headers: Headers): Record<string, string>
+{
+    const output: Record<string, string> = {};
+    headers.forEach((value, key) => output[key] = value);
+    return output;
+}
+
+class Singleton<T>
+{
+    private value_: T | object;
+
+    public constructor(private readonly closure_: () => T)
+    {
+        this.value_ = NOT_MOUNTED_YET;
+    }
+
+    public get(): T
+    {
+        if (this.value_ === NOT_MOUNTED_YET)
+            this.value_ = this.closure_();
+        return this.value_ as T;
+    }
+}
+const NOT_MOUNTED_YET = {};
