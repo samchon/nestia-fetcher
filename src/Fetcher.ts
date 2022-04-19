@@ -53,6 +53,7 @@ export class Fetcher
      * @param method Method of the HTTP request
      * @param path Path of the HTTP request
      * @param input Request body data for the HTTP request
+     * @param stringify JSON string conversion function, default is the `JSON.stringify`
      * @return Response body data from the remote HTTP server
      */
     public static fetch<Input, Output>
@@ -61,7 +62,8 @@ export class Fetcher
             encrypted: Fetcher.IEncrypted, 
             method: "POST" | "PUT" | "PATCH", 
             path: string, 
-            input: Input
+            input: Input,
+            stringify?: (input: Input) => string
         ): Promise<Primitive<Output>>;
 
     public static async fetch<Output>
@@ -70,7 +72,8 @@ export class Fetcher
             encrypted: Fetcher.IEncrypted, 
             method: "GET" | "DELETE" | "POST" | "PUT" | "PATCH", 
             path: string, 
-            input?: object
+            input?: object,
+            stringify?: (input: object) => string
         ): Promise<Primitive<Output>>
     {
         if (encrypted.request === true || encrypted.response === true)
@@ -94,7 +97,7 @@ export class Fetcher
         // REQUEST BODY (WITH ENCRYPTION)
         if (input !== undefined)
         {
-            let body: string = JSON.stringify(input);
+            let body: string = (stringify || JSON.stringify)(input);
             if (encrypted.request === true)
             {
                 const headers: Singleton<Record<string, string>> = new Singleton(() => init.headers as Record<string, string>);
