@@ -7,6 +7,9 @@
   "scripts": {
     "build": "rimraf lib && tsc",
     "dev": "npm run build -- --watch",
+    "eslint": "eslint src",
+    "eslint:fix": "eslint src --fix",
+    "prettier": "prettier src --write",
     "test": "npm run build"
   },
   "repository": {
@@ -24,6 +27,9 @@
   },
   "homepage": "https://github.com/samchon/nestia-fetcher#readme",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.26.0",
+    "@typescript-eslint/parser": "^5.26.0",
+    "prettier": "^2.6.2",
     "rimraf": "^3.0.2",
     "typescript": "^4.5.3"
   },
