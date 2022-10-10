@@ -209,11 +209,8 @@ const polyfill = new Singleton(async (): Promise<typeof fetch> => {
         typeof global.process.versions === "object" &&
         typeof global.process.versions.node !== undefined
     ) {
-        console.log("This is node", global.fetch);
-        if (global.fetch === undefined) {
+        if (global.fetch === undefined)
             global.fetch = ((await import2("node-fetch")) as any).default;
-            console.log("after loading", global.fetch);
-        }
         return (global as any).fetch;
     }
     return window.fetch;
