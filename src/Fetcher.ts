@@ -1,18 +1,12 @@
+import import2 from "import2";
+
 import { IConnection } from "./IConnection";
 import { IEncryptionPassword } from "./IEncryptionPassword";
 import { Primitive } from "./Primitive";
 
 import { AesPkcs5 } from "./AesPkcs5";
 import { HttpError } from "./HttpError";
-
-// POLYFILL FOR NODE
-if (
-    typeof global === "object" &&
-    typeof global.process === "object" &&
-    typeof global.process.versions === "object" &&
-    typeof global.process.versions.node !== undefined
-)
-    (global as any).fetch = require("node-fetch");
+import { Singleton } from "./internal/Singleton";
 
 /**
  * Fetcher, utility class for the [**Nestia**](https://github.com/samchon/nestia) fetch.
@@ -130,9 +124,8 @@ export class Fetcher {
         const url: URL = new URL(`${connection.host}${path}`);
 
         // DO FETCH
-        const response: Response = await fetch(url.href, init);
+        const response: Response = await (await polyfill.get())(url.href, init);
         let body: string = await response.text();
-
         if (!body) return undefined!;
 
         // CHECK THE STATUS CODE
@@ -209,6 +202,23 @@ export namespace Fetcher {
     }
 }
 
+const polyfill = new Singleton(async (): Promise<typeof fetch> => {
+    if (
+        typeof global === "object" &&
+        typeof global.process === "object" &&
+        typeof global.process.versions === "object" &&
+        typeof global.process.versions.node !== undefined
+    ) {
+        console.log("This is node", global.fetch);
+        if (global.fetch === undefined) {
+            global.fetch = ((await import2("node-fetch")) as any).default;
+            console.log("after loading", global.fetch);
+        }
+        return (global as any).fetch;
+    }
+    return window.fetch;
+});
+
 function is_disabled(
     password: IEncryptionPassword,
     headers: Singleton<Record<string, string>>,
@@ -232,17 +242,3 @@ function headers_to_object(headers: Headers): Record<string, string> {
     headers.forEach((value, key) => (output[key] = value));
     return output;
 }
-
-class Singleton<T> {
-    private value_: T | object;
-
-    public constructor(private readonly closure_: () => T) {
-        this.value_ = NOT_MOUNTED_YET;
-    }
-
-    public get(): T {
-        if (this.value_ === NOT_MOUNTED_YET) this.value_ = this.closure_();
-        return this.value_ as T;
-    }
-}
-const NOT_MOUNTED_YET = {};

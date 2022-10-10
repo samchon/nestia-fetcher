@@ -1,6 +1,6 @@
 {
   "name": "nestia-fetcher",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Fetcher for the Nestia",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -9,8 +9,7 @@
     "dev": "npm run build -- --watch",
     "eslint": "eslint src",
     "eslint:fix": "eslint src --fix",
-    "prettier": "prettier src --write",
-    "test": "npm run build"
+    "prettier": "prettier src --write"
   },
   "repository": {
     "type": "git",
@@ -27,14 +26,16 @@
   },
   "homepage": "https://github.com/samchon/nestia-fetcher#readme",
   "devDependencies": {
+    "@types/node": "^18.8.3",
     "@typescript-eslint/eslint-plugin": "^5.26.0",
     "@typescript-eslint/parser": "^5.26.0",
     "prettier": "^2.6.2",
     "rimraf": "^3.0.2",
-    "typescript": "^4.5.3"
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
   },
   "dependencies": {
-    "@types/node": "^16.11.12",
+    "import2": "^1.0.2",
     "node-fetch": "^2.6.1"
   }
 }
