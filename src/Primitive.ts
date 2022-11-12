@@ -28,17 +28,12 @@
  * @template Instance Target argument type.
  * @author Jenogho Nam - https://github.com/samchon
  */
-export type Primitive<Instance> = value_of<Instance> extends object
-    ? Instance extends object
-        ? Instance extends IJsonable<infer Raw>
-            ? value_of<Raw> extends object
-                ? Raw extends object
-                    ? PrimitiveObject<Raw> // object would be primitified
-                    : never // cannot be
-                : value_of<Raw> // atomic value
-            : PrimitiveObject<Instance> // object would be primitified
-        : never // cannot be
-    : value_of<Instance>;
+export type Primitive<Instance> = _Equal<
+    Instance,
+    _Primitive<Instance>
+> extends true
+    ? Instance
+    : _Primitive<Instance>;
 
 export namespace Primitive {
     /**
@@ -67,23 +62,37 @@ export namespace Primitive {
     }
 }
 
-type PrimitiveObject<Instance extends object> = Instance extends Array<infer T>
-    ? Primitive<T>[]
+type _Equal<X, Y> = X extends Y ? (Y extends X ? true : false) : false;
+
+type _Primitive<Instance> = _ValueOf<Instance> extends object
+    ? Instance extends object
+        ? Instance extends IJsonable<infer Raw>
+            ? _ValueOf<Raw> extends object
+                ? Raw extends object
+                    ? _PrimitiveObject<Raw> // object would be primitified
+                    : never // cannot be
+                : _ValueOf<Raw> // atomic value
+            : _PrimitiveObject<Instance> // object would be primitified
+        : never // cannot be
+    : _ValueOf<Instance>;
+
+type _PrimitiveObject<Instance extends object> = Instance extends Array<infer T>
+    ? _Primitive<T>[]
     : {
           [P in keyof Instance]: Instance[P] extends Function
               ? never
-              : Primitive<Instance[P]>;
+              : _Primitive<Instance[P]>;
       };
 
-type value_of<Instance> = is_value_of<Instance, Boolean> extends true
+type _ValueOf<Instance> = _IsValueOf<Instance, Boolean> extends true
     ? boolean
-    : is_value_of<Instance, Number> extends true
+    : _IsValueOf<Instance, Number> extends true
     ? number
-    : is_value_of<Instance, String> extends true
+    : _IsValueOf<Instance, String> extends true
     ? string
     : Instance;
 
-type is_value_of<
+type _IsValueOf<
     Instance,
     Object extends IValueOf<any>,
 > = Instance extends Object
