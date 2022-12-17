@@ -1,5 +1,6 @@
+> Renamed to [`@nestia/fetcher`](https://github.com/samchon/nestia)
+
 # Nestia Fetcher
-## Outline
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/samchon/nestia-fetcher/blob/master/LICENSE)
 [![npm version](https://badge.fury.io/js/nestia-fetcher.svg)](https://www.npmjs.com/package/nestia-fetcher)
 [![Downloads](https://img.shields.io/npm/dm/nestia-fetcher.svg)](https://www.npmjs.com/package/nestia-fetcher)
